@@ -1,0 +1,29 @@
+{
+  "name": "heures",
+  "authors": [
+    "Paul-Antoine <palevasseur@gmail.com>"
+  ],
+  "description": "",
+  "main": "index.html",
+  "moduleType": [],
+  "license": "MIT",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "polymer": "Polymer/polymer#^1.6.0",
+    "paper-header-panel": "PolymerElements/paper-header-panel#^1.1.6",
+    "paper-toolbar": "PolymerElements/paper-toolbar#^1.1.6",
+    "paper-input": "PolymerElements/paper-input#^1.1.14",
+    "paper-dropdown-menu": "PolymerElements/paper-dropdown-menu#^1.2.2",
+    "paper-listbox": "polymerelements/paper-listbox#^1.1.2",
+    "paper-item": "PolymerElements/paper-item#^1.2.1",
+    "paper-card": "PolymerElements/paper-card#^1.1.1"
+  }
+}
