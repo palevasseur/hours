@@ -8,7 +8,6 @@
     <title>Heures</title>
 
     <script src="./bower_components/webcomponentsjs/webcomponents.js"></script>
-    <!--link rel="import" href="./elements/element-hello.html"-->
     <link rel="import" href="./bower_components/paper-header-panel/paper-header-panel.html">
     <link rel="import" href="./bower_components/paper-toolbar/paper-toolbar.html">
     <link rel="import" href="./bower_components/iron-flex-layout/iron-flex-layout.html">
@@ -17,17 +16,8 @@
     <link rel="import" href="./bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
     <link rel="import" href="./bower_components/paper-card/paper-card.html">
 
-    <script src="https://www.gstatic.com/firebasejs/live/3.0/firebase.js"></script>
-    <script>
-        // Initialize Firebase
-        var config = {
-            apiKey: "AIzaSyAbU4Ok7ufne_5sZt1CBuTe2jCGh2V9IAo",
-            authDomain: "project-3010963349219589577.firebaseapp.com",
-            databaseURL: "https://project-3010963349219589577.firebaseio.com",
-            storageBucket: "project-3010963349219589577.appspot.com",
-        };
-        firebase.initializeApp(config);
-    </script>
+    <link rel="import" href="./elements/hours-card.html">
+    <link rel="import" href="./elements/hdbase-service.html">
 
     <style is="custom-style">
         paper-header-panel {
@@ -40,6 +30,9 @@
             background-color: rgba(127, 226, 159, 0.24);
         }
         paper-card {
+            width: 100%;
+        }
+        hours-card {
             width: 100%;
         }
     </style>
@@ -75,35 +68,9 @@
         </paper-toolbar>
 
         <div class="content fit">
-            <paper-card heading="Garde">
-                <div class="card-content">
-                    <div id="idHoursListGarde"></div>
-                    <div>
-                        jour: <input id="idJourGarde"/>
-                        <button onclick="setBeginHour('garde')">debut</button>
-                        <button onclick="setEndHour('garde')">fin</button>
-                    </div>
-                </div>
-                <!--div class="card-actions">
-                    <paper-button>Share</paper-button>
-                    <paper-button>Explore!</paper-button>
-                </div-->
-            </paper-card>
+            <hours-card title="Garde" month="07" year="2016" service="garde"></hours-card>
             <div style="height: 10px"></div>
-            <paper-card heading="Ménage">
-                <div class="card-content">
-                    <div id="idHoursListMenage"></div>
-                    <div>
-                        jour: <input id="idJourMenage"/>
-                        <input type="button" onclick="setBeginHour('menage')" value="debut"/>
-                        <input type="button" onclick="setEndHour('menage')" value="fin"/>
-                    </div>
-                </div>
-                <!--div class="card-actions">
-                    <paper-button>Share</paper-button>
-                    <paper-button>Explore!</paper-button>
-                </div-->
-            </paper-card>
+            <hours-card title="Ménage" month="07" year="2016" service="menage"></hours-card>
         </div>
     </paper-header-panel>
 
@@ -116,68 +83,11 @@
 
             idLbAnnee.selectIndex(yearMonth[0]-2015);
             idLbAnnee.addEventListener("iron-select", function(){
-                displayAll();
+                // todo: refresh year
             });
             idLbMois.selectIndex(yearMonth[1]-1);
             idLbMois.addEventListener("iron-select", function(){
-                displayAll();
-            });
-        }
-
-        function displayAll() {
-            displayHours('garde', 'idHoursListGarde');
-            displayHours('menage', 'idHoursListMenage');
-        }
-
-        function getNowDate() {
-            var now = new Date();
-            var date = now.toJSON();
-            var yearMonth = date.split('T')[0];
-            return {
-                yearMonth: yearMonth,
-                date: date
-            };
-        }
-
-        function setBeginHour(service) {
-            var now = getNowDate();
-            writeHour(service, now.yearMonth, 'begin', now.date);
-        }
-
-        function setEndHour(service) {
-            var now = getNowDate();
-            writeHour(service, now.yearMonth, 'end', now.date);
-        }
-
-        function writeHour(service, month, beginEnd, entry) {
-            firebase.database().ref(service + '/' + month + '/' + beginEnd).set(entry);
-        }
-        
-        function displayHours(service, listTag) {
-            var startDate  = idLbAnnee.selectedItem.getAttribute("value") + '-' + idLbMois.selectedItem.getAttribute("value") + '-01';
-            var endDate = idLbAnnee.selectedItem.getAttribute("value") + '-' + idLbMois.selectedItem.getAttribute("value") + '-31';
-            firebase.database()
-                    .ref(service)
-                    .orderByKey()
-                    .startAt(startDate)
-                    .endAt(endDate)
-                    .on('value', function(snapshot) {
-                var list = window.document.getElementById(listTag);
-                list.innerHTML = '';
-
-                var value =  snapshot.val();
-                for(var index in value) {
-                    var attr = value[index];
-
-                    var e = document.createElement('div');
-                    var begin = new Date(attr.begin);
-                    var end = new Date(attr.end);
-                    var timeMinutes = Math.floor((end - begin)/(1000 * 60));
-                    var hours = Math.floor(timeMinutes / 60);
-                    var minutes = timeMinutes % 60;
-                    e.innerHTML = index + ': ' + attr.begin + ' / ' + attr.end + ' = ' + ((hours<10) ? '0' : '') + hours + 'h' + ((minutes<10) ? '0' : '') + minutes;
-                    list.appendChild(e);
-                }
+                // todo: refresh month
             });
         }
 

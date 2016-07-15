@@ -1,0 +1,36 @@
+<!--link rel="import" href="../bower_components/polymer/polymer.html"-->
+<script src="../bower_components/firebase/firebase.js"></script>
+<!-- todo: firebase.js define window.firebase, need to encapsulate -->
+
+<script>
+    (function() {
+        function HDBase() {
+            // Initialize Firebase
+            var config = {
+                apiKey: "AIzaSyAbU4Ok7ufne_5sZt1CBuTe2jCGh2V9IAo",
+                authDomain: "project-3010963349219589577.firebaseapp.com",
+                databaseURL: "https://project-3010963349219589577.firebaseio.com",
+                storageBucket: "project-3010963349219589577.appspot.com",
+            };
+            firebase.initializeApp(config);
+            window.console.log('Firebase initialized');
+        }
+
+        HDBase.prototype.setHour = function(service, month, beginEnd, entry) {
+            firebase.database().ref(service + '/' + month + '/' + beginEnd).set(entry);
+        };
+
+        HDBase.prototype.getHours = function(service, startDate, endDate, snapshot) {
+            firebase.database()
+                    .ref(service)
+                    .orderByKey()
+                    .startAt(startDate)
+                    .endAt(endDate)
+                    .on('value', snapshot);
+        };
+
+        window.hDBase = new HDBase();
+
+    })();
+
+</script>

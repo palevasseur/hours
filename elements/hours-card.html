@@ -1,0 +1,104 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="./hdbase-service.html">
+
+<dom-module id="hours-card">
+
+    <template>
+        <style>
+            /* CSS rules for your element */
+        </style>
+
+        <paper-card heading="{{title}}">
+            <div class="card-content">
+                <div id="idHours"></div>
+                <div>
+                    jour: <input id="idJourGardeX"/>
+                    <button on-click="_setBeginHour">debut</button>
+                    <button on-click="_setEndHour">fin</button>
+                </div>
+            </div>
+            <!--div class="card-actions">
+                <paper-button>Share</paper-button>
+                <paper-button>Explore!</paper-button>
+            </div-->
+        </paper-card>
+
+    </template>
+
+    <script>
+        function getNowDate() {
+            var now = new Date();
+            var date = now.toJSON();
+            var yearMonth = date.split('T')[0];
+            return {
+                yearMonth: yearMonth,
+                date: date
+            };
+        }
+
+        // element registration
+        Polymer({
+            is: "hours-card",
+
+            ready: function () {
+                this._displayHours();
+            },
+
+            properties: {
+                // declare properties for the element's public API
+                title: {
+                    type: String,
+                    value: "Hours"
+                },
+                service: {
+                    type: String,
+                    value: "garde"
+                },
+                month: {
+                    type: String,
+                    value: "07"
+                },
+                year: {
+                    type: String,
+                    value: "2016"
+                }
+            },
+
+            _displayHours: function() {
+                var list = this.$.idHours;
+                var startDate = this.year + '-' + this.month + '-01';
+                var endDate = this.year + '-' + this.month + '-31';
+
+                window.hDBase.getHours(this.service, startDate, endDate, function (snapshot) {
+                    list.innerHTML = ''; // clear list before update with new values
+                    var value = snapshot.val();
+                    for (var index in value) {
+                        var attr = value[index];
+
+                        var e = document.createElement('div');
+                        var begin = new Date(attr.begin);
+                        var end = new Date(attr.end);
+                        var timeMinutes = Math.floor((end - begin) / (1000 * 60));
+                        var hours = Math.floor(timeMinutes / 60);
+                        var minutes = timeMinutes % 60;
+                        e.innerHTML = index + ': ' + attr.begin + ' / ' + attr.end + ' = ' + ((hours < 10) ? '0' : '') + hours + 'h' + ((minutes < 10) ? '0' : '') + minutes;
+                        list.appendChild(e);
+                    }
+                });
+            },
+            _setBeginHour: function() {
+                var now = getNowDate();
+                window.hDBase.setHour(this.service, now.yearMonth, 'begin', now.date);
+            },
+            _setEndHour: function () {
+                var now = getNowDate();
+                window.hDBase.setHour(this.service, now.yearMonth, 'end', now.date);
+            }
+
+        });
+
+
+    </script>
+
+</dom-module>
