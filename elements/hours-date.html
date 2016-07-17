@@ -1,0 +1,72 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-item/paper-item.html">
+<link rel="import" href="../bower_components/paper-listbox/paper-listbox.html">
+<link rel="import" href="../bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
+
+<dom-module id="hours-date">
+
+    <template>
+        <style>
+            /* local CSS here */
+        </style>
+
+        <paper-dropdown-menu label="Mois">
+            <paper-listbox id="idMonth" class="dropdown-content" on-iron-select="monthChanged">
+                <paper-item value="01">01 Janvier</paper-item>
+                <paper-item value="02">02 Février</paper-item>
+                <paper-item value="03">03 Mars</paper-item>
+                <paper-item value="04">04 Avril</paper-item>
+                <paper-item value="05">05 Mai</paper-item>
+                <paper-item value="06">06 Juin</paper-item>
+                <paper-item value="07">07 Juillet</paper-item>
+                <paper-item value="08">08 Août</paper-item>
+                <paper-item value="09">09 Septembre</paper-item>
+                <paper-item value="10">10 Octobre</paper-item>
+                <paper-item value="11">11 Novembre</paper-item>
+                <paper-item value="12">12 Décembre</paper-item>
+            </paper-listbox>
+        </paper-dropdown-menu>
+        <paper-dropdown-menu label="Années">
+            <paper-listbox id="idYear" class="dropdown-content" on-iron-select="yearChanged">
+                <paper-item value="2015">2015</paper-item>
+                <paper-item value="2016">2016</paper-item>
+                <paper-item value="2017">2017</paper-item>
+            </paper-listbox>
+        </paper-dropdown-menu>
+
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'hours-date',
+            ready: function () {
+                var nowYearMonth = (new Date()).toJSON().split('T')[0].split('-');
+                var nowYear = nowYearMonth[0];
+                var nowMonth = nowYearMonth[1];
+
+                this.$.idYear.selectIndex(nowYear-2015); // todo: search value==yearMonth[0] in listbox
+                this.$.idMonth.selectIndex(nowMonth-1); // todo: search value==yearMonth[1] in listbox
+            },
+            properties: {
+                month: {
+                    type: String,
+                    notify: true
+                },
+                year: {
+                    type: String,
+                    notify: true
+                }
+            },
+            monthChanged: function (event) {
+                // todo: use calculated month parameter
+                this.month = this.$.idMonth.selectedItem.getAttribute("value");
+            },
+            yearChanged: function (event) {
+                // todo: use calculated year parameter
+                this.year = this.$.idYear.selectedItem.getAttribute("value");
+            }
+        });
+    </script>
+
+</dom-module>
