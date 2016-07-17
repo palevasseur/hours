@@ -6,7 +6,10 @@
 
     <template>
         <style>
-            /* CSS rules for your element */
+            paper-card {
+                padding-top: 10px;
+                width: 100%;
+            }
         </style>
 
         <paper-card heading="{{title}}">
@@ -39,7 +42,7 @@
 
         // element registration
         Polymer({
-            is: "hours-card",
+            is: 'hours-card',
 
             ready: function () {
                 this._displayHours();
@@ -49,19 +52,22 @@
                 // declare properties for the element's public API
                 title: {
                     type: String,
-                    value: "Hours"
+                    value: 'Hours'
                 },
                 service: {
                     type: String,
-                    value: "garde"
+                    value: 'garde',
+                    observer: '_displayHours'
                 },
                 month: {
                     type: String,
-                    value: "07"
+                    value: '07',
+                    observer: '_displayHours'
                 },
                 year: {
                     type: String,
-                    value: "2016"
+                    value: '2016',
+                    observer: '_displayHours'
                 }
             },
 

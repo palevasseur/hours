@@ -11,13 +11,9 @@
     <link rel="import" href="./bower_components/paper-header-panel/paper-header-panel.html">
     <link rel="import" href="./bower_components/paper-toolbar/paper-toolbar.html">
     <link rel="import" href="./bower_components/iron-flex-layout/iron-flex-layout.html">
-    <link rel="import" href="./bower_components/paper-item/paper-item.html">
-    <link rel="import" href="./bower_components/paper-listbox/paper-listbox.html">
-    <link rel="import" href="./bower_components/paper-dropdown-menu/paper-dropdown-menu.html">
-    <link rel="import" href="./bower_components/paper-card/paper-card.html">
 
     <link rel="import" href="./elements/hours-card.html">
-    <link rel="import" href="./elements/hdbase-service.html">
+    <link rel="import" href="./elements/hours-date.html">
 
     <style is="custom-style">
         paper-header-panel {
@@ -29,12 +25,7 @@
         paper-toolbar {
             background-color: rgba(127, 226, 159, 0.24);
         }
-        paper-card {
-            width: 100%;
-        }
-        hours-card {
-            width: 100%;
-        }
+
     </style>
 </head>
 
@@ -42,56 +33,27 @@
     <paper-header-panel mode="standard" class="vertical layout fit">
 
         <paper-toolbar>
-            <paper-dropdown-menu label="Mois">
-                <paper-listbox id="idLbMois" class="dropdown-content">
-                    <paper-item value="01">01 Janvier</paper-item>
-                    <paper-item value="02">02 Février</paper-item>
-                    <paper-item value="03">03 Mars</paper-item>
-                    <paper-item value="04">04 Avril</paper-item>
-                    <paper-item value="05">05 Mai</paper-item>
-                    <paper-item value="06">06 Juin</paper-item>
-                    <paper-item value="07">07 Juillet</paper-item>
-                    <paper-item value="08">08 Août</paper-item>
-                    <paper-item value="09">09 Septembre</paper-item>
-                    <paper-item value="10">10 Octobre</paper-item>
-                    <paper-item value="11">11 Novembre</paper-item>
-                    <paper-item value="12">12 Décembre</paper-item>
-                </paper-listbox>
-            </paper-dropdown-menu>
-            <paper-dropdown-menu label="Années">
-                <paper-listbox id="idLbAnnee" class="dropdown-content">
-                    <paper-item value="2015">2015</paper-item>
-                    <paper-item value="2016">2016</paper-item>
-                    <paper-item value="2017">2017</paper-item>
-                </paper-listbox>
-            </paper-dropdown-menu>
+            <hours-date id="idCurrentDate"></hours-date>
         </paper-toolbar>
 
         <div class="content fit">
-            <hours-card title="Garde" month="07" year="2016" service="garde"></hours-card>
-            <div style="height: 10px"></div>
-            <hours-card title="Ménage" month="07" year="2016" service="menage"></hours-card>
+            <hours-card id="idGarde" title="Garde" service="garde"></hours-card>
+            <hours-card id="idMenage" title="Ménage" service="menage"></hours-card>
         </div>
     </paper-header-panel>
 
     <script>
-        function init() {
-
-            var now = new Date();
-            var date = now.toJSON();
-            var yearMonth = date.split('T')[0].split('-');
-
-            idLbAnnee.selectIndex(yearMonth[0]-2015);
-            idLbAnnee.addEventListener("iron-select", function(){
-                // todo: refresh year
-            });
-            idLbMois.selectIndex(yearMonth[1]-1);
-            idLbMois.addEventListener("iron-select", function(){
-                // todo: refresh month
-            });
-        }
-
-        init();
+        // todo: with binding (create an app component and use {{currentMonth}} and {{currentYear}})
+        idCurrentDate.addEventListener("month-changed", function(e){
+            console.log('event month-changed', e.detail.value);
+            idGarde.month = e.detail.value;
+            idMenage.month = e.detail.value;
+        });
+        idCurrentDate.addEventListener("year-changed", function(e){
+            console.log('event year-changed', e.detail.value);
+            idGarde.year = e.detail.value;
+            idMenage.year = e.detail.value;
+        });
     </script>
 </body>
 </html>
