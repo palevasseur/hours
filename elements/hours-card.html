@@ -1,5 +1,6 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="./hours-hour.html">
 <link rel="import" href="./hdbase-service.html">
 
 <dom-module id="hours-card">
@@ -83,12 +84,7 @@
                         var attr = value[index];
 
                         var e = document.createElement('div');
-                        var begin = new Date(attr.begin);
-                        var end = new Date(attr.end);
-                        var timeMinutes = Math.floor((end - begin) / (1000 * 60));
-                        var hours = Math.floor(timeMinutes / 60);
-                        var minutes = timeMinutes % 60;
-                        e.innerHTML = index + ': ' + attr.begin + ' / ' + attr.end + ' = ' + ((hours < 10) ? '0' : '') + hours + 'h' + ((minutes < 10) ? '0' : '') + minutes;
+                        e.innerHTML = '<hours-hour start="' + attr.begin + '" end="' + attr.end + '"></hours-hour>';
                         list.appendChild(e);
                     }
                 });

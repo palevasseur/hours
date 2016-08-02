@@ -1,0 +1,104 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-time-picker/paper-time-picker.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="./hdbase-service.html">
+
+<dom-module id="hours-hour">
+
+    <template>
+        <style>
+            .time {
+                border: solid 1px gainsboro;
+                padding: 3px;
+            }
+
+            .elem {
+                borderOFF: solid 1px red;
+                line-height: 30px;
+            }
+        </style>
+
+        <div id="idHour">
+            <span>{{_day}}:</span>
+            <span class="time" on-tap="_handleTapStart">{{_timeStart}}</span>
+            <span> - </span>
+            <span class="time" on-tap="_handleTapEnd">{{_timeEnd}}</span>
+            <span> = {{_hours}}</span>
+        </div>
+        <paper-dialog id="dialog" modal class="paper-time-picker-dialog"
+                      on-iron-overlay-closed="dismissDialog">
+            <paper-time-picker id="timePicker"></paper-time-picker>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Cancel</paper-button>
+                <paper-button on-tap="_handleChangeTime" dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'hours-hour',
+            ready: function () {
+                this._refresh();
+            },
+            properties: {
+                start: String,
+                end: String,
+                _day: String,
+                _timeStart: String,
+                _timeEnd: String,
+                _hours: String,
+                _editTime: String
+            },
+            _refresh: function () {
+                this._day = this._getDay(this.start);
+                this._timeStart = this._getTime(this.start);
+                this._timeEnd = this._getTime(this.end);
+                this._hours = this._computeHours(this.start, this.end, 'h');
+            },
+            _handleTapStart: function() {
+                this._editTime = 'start';
+                this.$.timePicker.time = this._getTime(this.start, ':');
+                this.$.dialog.open();
+            },
+            _handleTapEnd: function() {
+                this._editTime = 'end';
+                this.$.timePicker.time = this._getTime(this.end, ':');
+                this.$.dialog.open();
+            },
+            _handleChangeTime: function() {
+                var hours = this.$.timePicker.hour;
+                var minutes = this.$.timePicker.minute;
+                var time = ((hours < 10) ? '0' : '') + hours + ':' + ((minutes < 10) ? '0' : '') + minutes + ':00.000Z';
+                this[this._editTime] = this[this._editTime].split('T')[0] + 'T' + time;
+                this._refresh();
+                // todo: garde/menage
+                // todo: refactor this.start => this.begin and remove here 'this._editTime=='start ? ...'
+                window.hDBase.setHour('garde', this[this._editTime].split('T')[0], this._editTime=='start' ? 'begin' : 'end', this[this._editTime]);
+            },
+            dismissDialog: function() {
+            },
+            _computeHours: function (start, end, sep) {
+                sep = sep || ':';
+                var begin = new Date(start);
+                var end = new Date(end);
+                var timeMinutes = Math.floor((end - begin) / (1000 * 60));
+                var hours = Math.floor(timeMinutes / 60);
+                var minutes = timeMinutes % 60;
+                return ((hours < 10) ? '0' : '') + hours + sep + ((minutes < 10) ? '0' : '') + minutes;
+            },
+            _getDay: function (date) {
+                // 2016-07-24T17:13:21.687Z => 24
+                return date.split('T')[0].split('-')[2];
+            },
+            _getTime: function (date, sep) {
+                // 2016-07-24T17:13:21.687Z => 17:13
+                var time = date.split('T')[1].split('.')[0].split(':');
+                return time[0] + (sep || 'h') + time[1];
+            }
+        });
+    </script>
+
+</dom-module>
