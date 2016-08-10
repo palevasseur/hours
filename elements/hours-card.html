@@ -1,6 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-date-picker/paper-date-picker.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 
 <link rel="import" href="./hours-hour.html">
 <link rel="import" href="./hdbase-service.html">
@@ -18,7 +19,7 @@
         <paper-card heading="{{title}}">
             <div class="card-content">
                 <div id="idHours"></div>
-                <paper-button on-tap="_openDateDialog">+</paper-button>
+                <paper-icon-button on-tap="_openDateDialog" icon="add-circle-outline"></paper-icon-button>
                 <paper-dialog id="idDateDialog" class="paper-date-picker-dialog" modal
                               on-iron-overlay-closed="dismissDialog">
                     <paper-date-picker id="idDatePicker" headingFormat="ddd D MMM" locale="fr"></paper-date-picker>
@@ -88,16 +89,18 @@
                 var list = this.$.idHours;
                 var startDate = this.year + '-' + this.month + '-01';
                 var endDate = this.year + '-' + this.month + '-31';
-                window.console.log('Display hours of month ' + this.month + ', year ' + this.year);
+                window.console.log('Display for month ' + this.month + ', year ' + this.year);
 
+                var service = this.service;
                 window.hDBase.getHours(this.service, startDate, endDate, function (snapshot) {
+                    window.console.log('Update hours, received snapshot from DB for service "' + service + '"');
                     list.innerHTML = ''; // clear list before update with new values
                     var value = snapshot.val();
                     for (var index in value) {
                         var attr = value[index];
 
                         var e = document.createElement('div');
-                        e.innerHTML = '<hours-hour start="' + attr.begin + '" end="' + attr.end + '"></hours-hour>';
+                        e.innerHTML = '<hours-hour start="' + attr.begin + '" end="' + attr.end + '" service="' + service + '"></hours-hour>';
                         list.appendChild(e);
                     }
                 });

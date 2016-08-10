@@ -1,8 +1,10 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <!-- todo: change with http://dotlouis.github.io/md-timepicker/components/md-timepicker/index.html-->
+<!-- todo: or https://customelements.io/SoldovskijBB/paper-time-picker/ -->
 <link rel="import" href="../bower_components/paper-time-picker/paper-time-picker.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="./hdbase-service.html">
 
 <dom-module id="hours-hour">
@@ -10,22 +12,23 @@
     <template>
         <style>
             .time {
-                border: solid 1px gainsboro;
+                border: solid 1px white;
+                cursor: pointer;
                 padding: 3px;
             }
-
-            .elem {
-                borderOFF: solid 1px red;
-                line-height: 30px;
+            .clearButton {
+                color: red;
+                visibility: hidden;
             }
         </style>
 
-        <div id="idHour">
+        <div id="idHour" on-mouseover="_select" on-mouseout="_unselect">
             <span>{{_day}}:</span>
-            <span class="time" on-tap="_handleTapStart">{{_timeStart}}</span>
+            <span id="idStartTime" class="time" on-tap="_handleTapStart">{{_timeStart}}</span>
             <span> - </span>
-            <span class="time" on-tap="_handleTapEnd">{{_timeEnd}}</span>
+            <span id="idEndTime" class="time" on-tap="_handleTapEnd">{{_timeEnd}}</span>
             <span> = {{_hours}}</span>
+            <paper-icon-button id="idClearButton" on-tap="_handleRemove" icon="clear" class="clearButton"></paper-icon-button>
         </div>
         <paper-dialog id="dialog" modal class="paper-time-picker-dialog"
                       on-iron-overlay-closed="dismissDialog">
@@ -47,6 +50,7 @@
             properties: {
                 start: String,
                 end: String,
+                service: String,
                 _day: String,
                 _timeStart: String,
                 _timeEnd: String,
@@ -59,6 +63,16 @@
                 this._timeEnd = this._getTime(this.end);
                 this._hours = this._computeHours(this.start, this.end, 'h');
             },
+            _select: function () {
+                this.$.idClearButton.style.visibility='visible';
+                this.$.idStartTime.style.border = "solid 1px gainsboro";
+                this.$.idEndTime.style.border = "solid 1px gainsboro";
+            },
+            _unselect: function () {
+                this.$.idClearButton.style.visibility='hidden';
+                this.$.idStartTime.style.border = "solid 1px white";
+                this.$.idEndTime.style.border = "solid 1px white";
+            },
             _handleTapStart: function() {
                 this._editTime = 'start';
                 this.$.timePicker.time = this._getTime(this.start, ':');
@@ -69,15 +83,17 @@
                 this.$.timePicker.time = this._getTime(this.end, ':');
                 this.$.dialog.open();
             },
+            _handleRemove: function() {
+                window.hDBase.removeHour(this.service, this.start.split('T')[0]);
+            },
             _handleChangeTime: function() {
                 var hours = this.$.timePicker.hour;
                 var minutes = this.$.timePicker.minute;
                 var time = ((hours < 10) ? '0' : '') + hours + ':' + ((minutes < 10) ? '0' : '') + minutes + ':00.000Z';
                 this[this._editTime] = this[this._editTime].split('T')[0] + 'T' + time;
                 this._refresh();
-                // todo: garde/menage
                 // todo: refactor this.start => this.begin and remove here 'this._editTime=='start ? ...'
-                window.hDBase.setHour('garde', this[this._editTime].split('T')[0], this._editTime=='start' ? 'begin' : 'end', this[this._editTime]);
+                window.hDBase.setHour(this.service, this[this._editTime].split('T')[0], this._editTime=='start' ? 'begin' : 'end', this[this._editTime]);
             },
             dismissDialog: function() {
             },

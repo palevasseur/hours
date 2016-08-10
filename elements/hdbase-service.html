@@ -29,6 +29,10 @@
                     .on('value', snapshot);
         };
 
+        HDBase.prototype.removeHour = function(service, month) {
+            firebase.database().ref(service + '/' + month).remove();
+        };
+
         window.hDBase = new HDBase();
 
     })();
