@@ -57,6 +57,12 @@
                 _hours: String,
                 _editTime: String
             },
+            getMinutes: function() {
+                var timeHM = this._computeHours(this.start, this.end, ':');
+                var timeH = timeHM.split(':')[0];
+                var timeM = timeHM.split(':')[1];
+                return (parseInt(timeH) * 60 + parseInt(timeM));
+            },
             _refresh: function () {
                 this._day = this._getDay(this.start);
                 this._timeStart = this._getTime(this.start);

@@ -16,18 +16,17 @@
     <link rel="import" href="./elements/hours-date.html">
 
     <!--
-     - remove paper tips "garde", "menage"
      - dialog to confirm "delete hour"
-     - add total hours
      - manage (+) to add hour:
         - propose = current month/year, last day not enterred.
         - if current month, propose current day
         - disable possibility to select month (month = the one selected in combobox)
         - disable day already enterred
      - add "highlight color" waiting DB callback
-     - add drop down service + url init (...?services=Garde:sabrina-garde,Ménage:sabrina-menage), if only 1 service don't add drop down
+     - add drop down service + login OR url init (...?services=Garde:sabrina-garde,Ménage:sabrina-menage), if only 1 service don't add drop down
      - remove fix scrollbar size on the right
      ---
+     - dynamic modal dialog
      - use better time picker (https://customelements.io/SoldovskijBB/paper-time-picker/ OR http://dotlouis.github.io/md-timepicker/components/md-timepicker/index.html
      - diff time < 0 => display "erreur"
      - new date => init with "contract time" (ex: 15h45 - 18h30)
@@ -57,8 +56,8 @@
         </paper-toolbar>
 
         <div class="content fit">
-            <hours-card id="idGarde" title="Garde" service="garde"></hours-card>
-            <hours-card id="idMenage" title="Ménage" service="menage"></hours-card>
+            <hours-card id="idGarde" name="Garde" service="garde"></hours-card>
+            <hours-card id="idMenage" name="Ménage" service="menage"></hours-card>
         </div>
     </paper-header-panel>
 

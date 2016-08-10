@@ -16,10 +16,11 @@
             }
         </style>
 
-        <paper-card heading="{{title}}">
+        <paper-card heading="{{name}}">
             <div class="card-content">
                 <div id="idHours"></div>
                 <paper-icon-button on-tap="_openDateDialog" icon="add-circle-outline"></paper-icon-button>
+                <div id="idTotalHours"></div>
                 <paper-dialog id="idDateDialog" class="paper-date-picker-dialog" modal
                               on-iron-overlay-closed="dismissDialog">
                     <paper-date-picker id="idDatePicker" headingFormat="ddd D MMM" locale="fr"></paper-date-picker>
@@ -47,7 +48,7 @@
 
             properties: {
                 // declare properties for the element's public API
-                title: {
+                name: {
                     type: String
                 },
                 service: {
@@ -61,6 +62,10 @@
                 year: {
                     type: String,
                     observer: '_displayHours'
+                },
+                totalHours: {
+                    type: Number,
+                    value: 0
                 }
             },
 
@@ -91,18 +96,26 @@
                 var endDate = this.year + '-' + this.month + '-31';
                 window.console.log('Display for month ' + this.month + ', year ' + this.year);
 
-                var service = this.service;
+                var self = this;
                 window.hDBase.getHours(this.service, startDate, endDate, function (snapshot) {
-                    window.console.log('Update hours, received snapshot from DB for service "' + service + '"');
+                    window.console.log('Update hours, received snapshot from DB for service "' + self.service + '"');
                     list.innerHTML = ''; // clear list before update with new values
                     var value = snapshot.val();
                     for (var index in value) {
                         var attr = value[index];
 
                         var e = document.createElement('div');
-                        e.innerHTML = '<hours-hour start="' + attr.begin + '" end="' + attr.end + '" service="' + service + '"></hours-hour>';
+                        e.innerHTML = '<hours-hour start="' + attr.begin + '" end="' + attr.end + '" service="' + self.service + '"></hours-hour>';
                         list.appendChild(e);
                     }
+
+                    // compute total hours for the month
+                    var hours = 0;
+                    for (var i = 0; i < list.children.length; i++) {
+                        hours += list.children[i].firstChild.getMinutes();
+                    }
+
+                    self.$.idTotalHours.innerHTML = '<br>Total heures = ' + self._format2digit(Math.floor(hours / 60)) + 'h' + self._format2digit(hours % 60);
                 });
             }
 
