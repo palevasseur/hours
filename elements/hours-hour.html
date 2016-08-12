@@ -30,14 +30,7 @@
             <span> = {{_hours}}</span>
             <paper-icon-button id="idClearButton" on-tap="_handleRemove" icon="clear" class="clearButton"></paper-icon-button>
         </div>
-        <paper-dialog id="dialog" modal class="paper-time-picker-dialog"
-                      on-iron-overlay-closed="dismissDialog">
-            <paper-time-picker id="timePicker"></paper-time-picker>
-            <div class="buttons">
-                <paper-button dialog-dismiss>Cancel</paper-button>
-                <paper-button on-tap="_handleChangeTime" dialog-confirm>OK</paper-button>
-            </div>
-        </paper-dialog>
+        <div id="idDialogContainer"></div>
 
     </template>
 
@@ -55,7 +48,9 @@
                 _timeStart: String,
                 _timeEnd: String,
                 _hours: String,
-                _editTime: String
+                _editTime: String,
+                _paperDialog: Object,
+                _timePicker: Object
             },
             getMinutes: function() {
                 var timeHM = this._computeHours(this.start, this.end, ':');
@@ -79,29 +74,106 @@
                 this.$.idStartTime.style.border = "solid 1px white";
                 this.$.idEndTime.style.border = "solid 1px white";
             },
+            _createDialogTimePicker: function() {
+                // todo: create timeDialog component
+                if(this._paperDialog) {
+                    return;
+                }
+
+                this._paperDialog = document.createElement('paper-dialog');
+                this._paperDialog.modal = true;
+                this._paperDialog.class = 'paper-time-picker-dialog';
+                this.$.idDialogContainer.appendChild(this._paperDialog);
+
+                this._timePicker = document.createElement('paper-time-picker');
+                this._paperDialog.appendChild(this._timePicker);
+
+                var divButtons = document.createElement('div');
+                divButtons.class = 'buttons';
+                this._paperDialog.appendChild(divButtons);
+
+                var cancelButton = document.createElement('paper-button');
+                cancelButton.innerText = 'Annuler';
+                cancelButton.dialogDismiss = true;
+                cancelButton.addEventListener('tap', this._handleCancel.bind(this));
+                divButtons.appendChild(cancelButton);
+
+                var okButton = document.createElement('paper-button');
+                okButton.innerText = 'OK';
+                okButton.addEventListener('tap', this._handleChangeTime.bind(this));
+                okButton.dialogConfirm = true;
+                divButtons.appendChild(okButton);
+            },
+            _createDialogConfirmDelete: function(text) {
+                // todo: create confirmDialog component
+                if(this._paperDialog) {
+                    return;
+                }
+
+                this._paperDialog = document.createElement('paper-dialog');
+                this._paperDialog.modal = true;
+                this.$.idDialogContainer.appendChild(this._paperDialog);
+
+                var message = document.createElement('div');
+                message.innerText = text;
+                this._paperDialog.appendChild(message);
+
+                var divButtons = document.createElement('div');
+                divButtons.class = 'buttons';
+                this._paperDialog.appendChild(divButtons);
+
+                var cancelButton = document.createElement('paper-button');
+                cancelButton.innerText = 'Annuler';
+                cancelButton.dialogDismiss = true;
+                cancelButton.addEventListener('tap', this._handleCancel.bind(this));
+                divButtons.appendChild(cancelButton);
+
+                var okButton = document.createElement('paper-button');
+                okButton.innerText = 'OK';
+                okButton.addEventListener('tap', this._removeHour.bind(this));
+                okButton.dialogConfirm = true;
+                divButtons.appendChild(okButton);
+            },
             _handleTapStart: function() {
+                this._createDialogTimePicker();
                 this._editTime = 'start';
-                this.$.timePicker.time = this._getTime(this.start, ':');
-                this.$.dialog.open();
+                this._timePicker.time = this._getTime(this.start, ':');
+                this._paperDialog.open();
             },
             _handleTapEnd: function() {
+                this._createDialogTimePicker();
                 this._editTime = 'end';
-                this.$.timePicker.time = this._getTime(this.end, ':');
-                this.$.dialog.open();
+                this._timePicker.time = this._getTime(this.end, ':');
+                this._paperDialog.open();
             },
             _handleRemove: function() {
+                // todo: replace this.service by this.name
+                this._createDialogConfirmDelete('Supprimer les heures de ' + this.service + ' du ' + this._day + ' ?');
+                this._paperDialog.open();
+            },
+            _removeHour: function() {
                 window.hDBase.removeHour(this.service, this.start.split('T')[0]);
             },
             _handleChangeTime: function() {
-                var hours = this.$.timePicker.hour;
-                var minutes = this.$.timePicker.minute;
+                var hours = this._timePicker.hour;
+                var minutes = this._timePicker.minute;
                 var time = ((hours < 10) ? '0' : '') + hours + ':' + ((minutes < 10) ? '0' : '') + minutes + ':00.000Z';
                 this[this._editTime] = this[this._editTime].split('T')[0] + 'T' + time;
                 this._refresh();
                 // todo: refactor this.start => this.begin and remove here 'this._editTime=='start ? ...'
                 window.hDBase.setHour(this.service, this[this._editTime].split('T')[0], this._editTime=='start' ? 'begin' : 'end', this[this._editTime]);
+                this._closeDialog();
             },
-            dismissDialog: function() {
+            _handleCancel: function() {
+                this._closeDialog();
+            },
+            _closeDialog: function() {
+                this._paperDialog.close();
+
+                // delete dialog
+                this.$.idDialogContainer.removeChild(this._paperDialog);
+                this._paperDialog = null;
+                this._timePicker = null;
             },
             _computeHours: function (start, end, sep) {
                 sep = sep || ':';
