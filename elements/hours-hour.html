@@ -1,10 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<!-- todo: change with http://dotlouis.github.io/md-timepicker/components/md-timepicker/index.html-->
-<!-- todo: or https://customelements.io/SoldovskijBB/paper-time-picker/ -->
-<link rel="import" href="../bower_components/paper-time-picker/paper-time-picker.html">
-<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
-<link rel="import" href="../bower_components/paper-button/paper-button.html">
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="./dialog-confirm.html">
+<link rel="import" href="./dialog-time.html">
 <link rel="import" href="./hdbase-service.html">
 
 <dom-module id="hours-hour">
@@ -48,9 +45,8 @@
                 _timeStart: String,
                 _timeEnd: String,
                 _hours: String,
-                _editTime: String,
-                _paperDialog: Object,
-                _timePicker: Object
+                _editTime: String, // todo: to put in dialog-time
+                _paperDialog: Object
             },
             getMinutes: function() {
                 var timeHM = this._computeHours(this.start, this.end, ':');
@@ -74,106 +70,56 @@
                 this.$.idStartTime.style.border = "solid 1px white";
                 this.$.idEndTime.style.border = "solid 1px white";
             },
-            _createDialogTimePicker: function() {
-                // todo: create timeDialog component
-                if(this._paperDialog) {
-                    return;
-                }
-
-                this._paperDialog = document.createElement('paper-dialog');
-                this._paperDialog.modal = true;
-                this._paperDialog.class = 'paper-time-picker-dialog';
-                this.$.idDialogContainer.appendChild(this._paperDialog);
-
-                this._timePicker = document.createElement('paper-time-picker');
-                this._paperDialog.appendChild(this._timePicker);
-
-                var divButtons = document.createElement('div');
-                divButtons.class = 'buttons';
-                this._paperDialog.appendChild(divButtons);
-
-                var cancelButton = document.createElement('paper-button');
-                cancelButton.innerText = 'Annuler';
-                cancelButton.dialogDismiss = true;
-                cancelButton.addEventListener('tap', this._handleCancel.bind(this));
-                divButtons.appendChild(cancelButton);
-
-                var okButton = document.createElement('paper-button');
-                okButton.innerText = 'OK';
-                okButton.addEventListener('tap', this._handleChangeTime.bind(this));
-                okButton.dialogConfirm = true;
-                divButtons.appendChild(okButton);
-            },
-            _createDialogConfirmDelete: function(text) {
-                // todo: create confirmDialog component
-                if(this._paperDialog) {
-                    return;
-                }
-
-                this._paperDialog = document.createElement('paper-dialog');
-                this._paperDialog.modal = true;
-                this.$.idDialogContainer.appendChild(this._paperDialog);
-
-                var message = document.createElement('div');
-                message.innerText = text;
-                this._paperDialog.appendChild(message);
-
-                var divButtons = document.createElement('div');
-                divButtons.class = 'buttons';
-                this._paperDialog.appendChild(divButtons);
-
-                var cancelButton = document.createElement('paper-button');
-                cancelButton.innerText = 'Annuler';
-                cancelButton.dialogDismiss = true;
-                cancelButton.addEventListener('tap', this._handleCancel.bind(this));
-                divButtons.appendChild(cancelButton);
-
-                var okButton = document.createElement('paper-button');
-                okButton.innerText = 'OK';
-                okButton.addEventListener('tap', this._removeHour.bind(this));
-                okButton.dialogConfirm = true;
-                divButtons.appendChild(okButton);
-            },
             _handleTapStart: function() {
-                this._createDialogTimePicker();
+                if(this._paperDialog) {
+                    this.$.idDialogContainer.removeChild(this._paperDialog);
+                }
+
+                this._paperDialog = document.createElement('dialog-time');
                 this._editTime = 'start';
-                this._timePicker.time = this._getTime(this.start, ':');
+                this._paperDialog.time = this._getTime(this.start, ':');
+                this._paperDialog.addEventListener('ok', this._changeStartTime.bind(this));
+                this.$.idDialogContainer.appendChild(this._paperDialog);
+
                 this._paperDialog.open();
             },
             _handleTapEnd: function() {
-                this._createDialogTimePicker();
+                if(this._paperDialog) {
+                    this.$.idDialogContainer.removeChild(this._paperDialog);
+                }
+
+                this._paperDialog = document.createElement('dialog-time');
                 this._editTime = 'end';
-                this._timePicker.time = this._getTime(this.end, ':');
+                this._paperDialog.time = this._getTime(this.end, ':');
+                this._paperDialog.addEventListener('ok', this._changeEndTime.bind(this));
+                this.$.idDialogContainer.appendChild(this._paperDialog);
+
                 this._paperDialog.open();
             },
             _handleRemove: function() {
-                // todo: replace this.service by this.name
-                this._createDialogConfirmDelete('Supprimer les heures de ' + this.service + ' du ' + this._day + ' ?');
+                if(this._paperDialog) {
+                    this.$.idDialogContainer.removeChild(this._paperDialog);
+                }
+
+                this._paperDialog = document.createElement('dialog-confirm');
+                this._paperDialog.message = 'Supprimer les heures de ' + this.service + ' du ' + this._day + ' ?';
+                this._paperDialog.addEventListener('ok', this._removeHour.bind(this));
+                this.$.idDialogContainer.appendChild(this._paperDialog);
+
                 this._paperDialog.open();
             },
             _removeHour: function() {
                 window.hDBase.removeHour(this.service, this.start.split('T')[0]);
             },
-            _handleChangeTime: function() {
-                var hours = this._timePicker.hour;
-                var minutes = this._timePicker.minute;
-                var time = ((hours < 10) ? '0' : '') + hours + ':' + ((minutes < 10) ? '0' : '') + minutes + ':00.000Z';
-                this[this._editTime] = this[this._editTime].split('T')[0] + 'T' + time;
+            _changeStartTime: function() {
+                this.start = this.start.split('T')[0] + 'T' + this._paperDialog.time;
+                window.hDBase.setHour(this.service, this.start.split('T')[0], 'begin', this.start);
                 this._refresh();
-                // todo: refactor this.start => this.begin and remove here 'this._editTime=='start ? ...'
-                window.hDBase.setHour(this.service, this[this._editTime].split('T')[0], this._editTime=='start' ? 'begin' : 'end', this[this._editTime]);
-                this._closeDialog();
             },
-            _handleCancel: function() {
-                this._closeDialog();
-            },
-            _closeDialog: function() {
-                this._paperDialog.close();
-
-                // delete dialog
-                this.$.idDialogContainer.removeChild(this._paperDialog);
-                this._paperDialog = null;
-                this._timePicker = null;
+            _changeEndTime: function() {
+                this.end = this.end.split('T')[0] + 'T' + this._paperDialog.time;
+                window.hDBase.setHour(this.service, this.end.split('T')[0], 'end', this.end);
+                this._refresh();
             },
             _computeHours: function (start, end, sep) {
                 sep = sep || ':';

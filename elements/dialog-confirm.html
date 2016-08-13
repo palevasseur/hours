@@ -1,0 +1,37 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
+<link rel="import" href="../bower_components/paper-button/paper-button.html">
+
+<dom-module id="dialog-confirm">
+
+    <template>
+        <style>
+            /* local CSS here */
+        </style>
+
+        <paper-dialog id="dialog" modal>
+            <div>[[message]]</div>
+            <div class="buttons">
+                <paper-button dialog-dismiss>Annuler</paper-button>
+                <paper-button on-tap="_handleOK" dialog-confirm>OK</paper-button>
+            </div>
+        </paper-dialog>
+
+    </template>
+
+    <script>
+        Polymer({
+            is: 'dialog-confirm',
+            properties: {
+                message: String
+            },
+            open: function() {
+                this.$.dialog.open();
+            },
+            _handleOK: function() {
+                this.fire('ok');
+            }
+        });
+    </script>
+
+</dom-module>

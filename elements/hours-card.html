@@ -1,7 +1,7 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
 <link rel="import" href="../bower_components/paper-card/paper-card.html">
 <link rel="import" href="../bower_components/paper-date-picker/paper-date-picker.html">
-<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="../bower_components/paper-fab/paper-fab.html">
 
 <link rel="import" href="./hours-hour.html">
 <link rel="import" href="./hdbase-service.html">
@@ -9,18 +9,28 @@
 <dom-module id="hours-card">
 
     <template>
-        <style>
+        <style is="custom-style">
             paper-card {
                 padding-top: 10px;
                 width: 100%;
+            }
+            .addButton {
+                position: absolute;
+                right: 15px;
+                bottom: 15px;
+            }
+            paper-fab.green {
+                --paper-fab-background: var(--paper-green-500);
+                --paper-fab-keyboard-focus-background: var(--paper-green-900);
             }
         </style>
 
         <paper-card heading="{{name}}">
             <div class="card-content">
                 <div id="idHours"></div>
-                <paper-icon-button on-tap="_openDateDialog" icon="add-circle-outline"></paper-icon-button>
                 <div id="idTotalHours"></div>
+                <paper-fab on-tap="_openDateDialog" icon="add" class="addButton green"></paper-fab>
+
                 <paper-dialog id="idDateDialog" class="paper-date-picker-dialog" modal
                               on-iron-overlay-closed="dismissDialog">
                     <paper-date-picker id="idDatePicker" headingFormat="ddd D MMM" locale="fr"></paper-date-picker>
