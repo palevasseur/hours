@@ -25,11 +25,11 @@
             }
         </style>
 
-        <paper-card heading="{{name}}">
+        <paper-card heading="[[name]]">
             <div class="card-content">
                 <div id="idHours"></div>
                 <div id="idTotalHours"></div>
-                <paper-fab on-tap="_openDateDialog" icon="add" class="addButton green"></paper-fab>
+                <paper-fab on-tap="_openDateDialog" icon="add" class="addButton green" title="Ajouter une date"></paper-fab>
 
                 <paper-dialog id="idDateDialog" class="paper-date-picker-dialog" modal
                               on-iron-overlay-closed="dismissDialog">
