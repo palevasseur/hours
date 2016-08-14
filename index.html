@@ -15,6 +15,8 @@
     <link rel="import" href="./elements/hours-card.html">
     <link rel="import" href="./elements/hours-date.html">
 
+    <!-- ex: ...&services=Garde:garde,Ménage:menage -->
+
     <!--
      - manage (+) to add hour:
         - propose = current month/year, last day not enterred.
@@ -23,12 +25,11 @@
         - disable day already enterred
      - add "highlight color" waiting DB callback
      - error message, on cnx failed
-     - add drop down service + login OR url init (...?services=Garde:sabrina-garde,Ménage:sabrina-menage), if only 1 service don't add drop down
      ---
-     - dynamic modal dialog
      - use better time picker (https://customelements.io/SoldovskijBB/paper-time-picker/ OR http://dotlouis.github.io/md-timepicker/components/md-timepicker/index.html
      - diff time < 0 => display "erreur"
      - new date => init with "contract time" (ex: 15h45 - 18h30)
+     - add drop down service, if only 1 service don't add drop down
      - review/better management for local/gmt (current issue with calc around 00h00)
      - check 'to do', check unseless dependency (remove iron-icon)
     -->
@@ -53,24 +54,47 @@
             <hours-date id="idCurrentDate"></hours-date>
         </paper-toolbar>
 
-        <div class="content fit">
-            <hours-card id="idGarde" name="Garde" service="garde" class="card"></hours-card>
-            <hours-card id="idMenage" name="Ménage" service="menage" class="card"></hours-card>
-        </div>
+        <div id="idCards" class="content fit"></div>
     </paper-header-panel>
 
     <script>
-        // todo: with binding (create an app component and use {{currentMonth}} and {{currentYear}})
-        idCurrentDate.addEventListener("month-changed", function(e){
-            console.log('event month-changed', e.detail.value);
-            idGarde.month = e.detail.value;
-            idMenage.month = e.detail.value;
-        });
-        idCurrentDate.addEventListener("year-changed", function(e){
-            console.log('event year-changed', e.detail.value);
-            idGarde.year = e.detail.value;
-            idMenage.year = e.detail.value;
-        });
+        function getSearchParameters() {
+            var prmstr = window.location.search.substr(1);
+            return prmstr != null && prmstr != "" ? transformToAssocArray(prmstr) : {};
+        }
+
+        function transformToAssocArray( prmstr ) {
+            var params = {};
+            var prmarr = decodeURIComponent(prmstr).split("&");
+            for ( var i = 0; i < prmarr.length; i++) {
+                var tmparr = prmarr[i].split("=");
+                params[tmparr[0]] = tmparr[1];
+            }
+            return params;
+        }
+
+        function init() {
+            var params = getSearchParameters();
+            if(params.services) {
+                var services = params.services.split(',');
+                for ( var i = 0; i < services.length; i++) {
+                    var service = services[i].split(':');
+                    var card = document.createElement('hours-card');
+                    card.name = service[0];
+                    card.service = service[1];
+                    idCurrentDate.addEventListener("month-changed", function(e){
+                        card.month = e.detail.value;
+                    });
+                    idCurrentDate.addEventListener("year-changed", function(e){
+                        card.year = e.detail.value;
+                    });
+
+                    idCards.appendChild(card);
+                }
+            }
+        }
+
+        init()
     </script>
 </body>
 </html>
