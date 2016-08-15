@@ -78,18 +78,20 @@
             if(params.services) {
                 var services = params.services.split(',');
                 for ( var i = 0; i < services.length; i++) {
-                    var service = services[i].split(':');
-                    var card = document.createElement('hours-card');
-                    card.name = service[0];
-                    card.service = service[1];
-                    idCurrentDate.addEventListener("month-changed", function(e){
-                        card.month = e.detail.value;
-                    });
-                    idCurrentDate.addEventListener("year-changed", function(e){
-                        card.year = e.detail.value;
-                    });
+                    (function() {
+                        var service = services[i].split(':');
+                        var card = document.createElement('hours-card');
+                        card.name = service[0];
+                        card.service = service[1];
+                        idCurrentDate.addEventListener("month-changed", function(e){
+                            card.month = e.detail.value;
+                        });
+                        idCurrentDate.addEventListener("year-changed", function(e){
+                            card.year = e.detail.value;
+                        });
 
-                    idCards.appendChild(card);
+                        idCards.appendChild(card);
+                    }) ();
                 }
             }
         }

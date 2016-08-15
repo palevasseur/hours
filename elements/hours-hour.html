@@ -55,10 +55,10 @@
                 return (parseInt(timeH) * 60 + parseInt(timeM));
             },
             _refresh: function () {
-                this._day = this._getDay(this.start);
-                this._timeStart = this._getTime(this.start);
-                this._timeEnd = this._getTime(this.end);
-                this._hours = this._computeHours(this.start, this.end, 'h');
+                this._day = this._getDay(this.start!='undefined' ? this.start : this.end);
+                this._timeStart = this.start!='undefined' ? this._getTime(this.start) : 'error-start-not-def';
+                this._timeEnd = this.end!='undefined' ? this._getTime(this.end) : 'error-end-not-def';;
+                this._hours = (this.start!='undefined' && this.end!='undefined') ? this._computeHours(this.start, this.end, 'h') : 'error-missing-def';
             },
             _select: function () {
                 this.$.idClearButton.style.visibility='visible';
@@ -109,7 +109,7 @@
                 this._paperDialog.open();
             },
             _removeHour: function() {
-                window.hDBase.removeHour(this.service, this.start.split('T')[0]);
+                window.hDBase.removeHour(this.service, this.start!='undefined' ? this.start.split('T')[0] : this.end.split('T')[0]);
             },
             _changeStartTime: function() {
                 this.start = this.start.split('T')[0] + 'T' + this._paperDialog.time;
