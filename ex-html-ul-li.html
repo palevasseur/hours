@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <!--
+        display:flex ref:
+        http://www.alsacreations.com/tuto/lire/1493-css3-flexbox-layout-module.html
+        https://css-tricks.com/snippets/css/a-guide-to-flexbox/
+        http://jonibologna.com/flexbox-cheatsheet/
+     -->
+
+    <style>
+        ul {
+            list-style: none;
+        }
+
+        li {
+            display: flex;
+            padding: 20px;
+        }
+
+        li img {
+            border-radius: 50%;
+            margin-right: 40px;
+            width: 80px; /* need to fix with display: flex*/
+        }
+
+        li + li {
+            border-top: solid 1px #666;
+        }
+
+        h3 {
+            margin: 0 40px 0 0;
+            line-height: 80px;
+        }
+
+        li span {
+            line-height: 80px;
+        }
+    </style>
+
+</head>
+<body>
+    <ul>
+        <li>
+            <img src="https://randomuser.me/api/portraits/thumb/women/7.jpg">
+            <h3>Anna</h3>
+            <span>anna@gmail.com</span>
+        </li>
+        <li>
+            <img src="https://randomuser.me/api/portraits/thumb/women/5.jpg">
+            <h3>Anna</h3>
+            <span>anna@gmail.com</span>
+        </li>
+        <li>
+            <img src="https://randomuser.me/api/portraits/thumb/women/6.jpg">
+            <h3>Anna</h3>
+            <span>anna@gmail.com</span>
+        </li>
+    </ul>
+
+</body>
+</html>
