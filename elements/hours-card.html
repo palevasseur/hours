@@ -101,23 +101,33 @@
                 window.hDBase.setHour(this.service, newDate, 'end', newDate + 'T' + newTime);
             },
             _displayHours: function() {
+                if(!this.month || !this.year) {
+                    return;
+                }
+
                 var list = this.$.idHours;
                 var startDate = this.year + '-' + this.month + '-01';
                 var endDate = this.year + '-' + this.month + '-31';
-                window.console.log('Display for month ' + this.month + ', year ' + this.year);
+                window.console.log('Display for month ' + this.month + ', year ' + this.year + ', and listen ' + startDate + '->' + endDate);
 
                 var self = this;
                 window.hDBase.getHours(this.service, startDate, endDate, function (snapshot) {
-                    window.console.log('Update hours, received snapshot from DB for service "' + self.service + '"');
                     list.innerHTML = ''; // clear list before update with new values
                     var value = snapshot.val();
+                    var nbrItems = 0;
+                    var nbrItemsUsed = 0;
                     for (var index in value) {
-                        var attr = value[index];
-
-                        var e = document.createElement('div');
-                        e.innerHTML = '<hours-hour start="' + attr.begin + '" end="' + attr.end + '" service="' + self.service + '"></hours-hour>';
-                        list.appendChild(e);
+                        nbrItems++;
+                        if(index.split('-')[0]==self.year && index.split('-')[1]==self.month) {
+                            nbrItemsUsed++;
+                            var attr = value[index];
+                            var e = document.createElement('div');
+                            e.innerHTML = '<hours-hour start="' + attr.begin + '" end="' + attr.end + '" service="' + self.service + '"></hours-hour>';
+                            list.appendChild(e);
+                        }
                     }
+
+                    window.console.log('Updated hours (' + nbrItemsUsed + ' items), received (total of ' + nbrItems + ' items) from DB for service "' + self.service + '"');
 
                     // compute total hours for the month
                     var hours = 0;

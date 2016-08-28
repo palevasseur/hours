@@ -21,11 +21,12 @@
         };
 
         HDBase.prototype.getHours = function(service, startDate, endDate, snapshot) {
+            // todo: filter startAt/EndAt => update not working well => received all service and filter only items needed, to review
             firebase.database()
                     .ref(service)
                     .orderByKey()
-                    .startAt(startDate)
-                    .endAt(endDate)
+                    //.startAt(startDate)
+                    //.endAt(endDate)
                     .on('value', snapshot);
         };
 
