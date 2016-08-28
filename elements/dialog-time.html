@@ -1,19 +1,15 @@
 <link rel="import" href="../bower_components/polymer/polymer.html">
-<!-- todo: change with http://dotlouis.github.io/md-timepicker/components/md-timepicker/index.html-->
-<!-- todo: or https://customelements.io/SoldovskijBB/paper-time-picker/ -->
-<link rel="import" href="../bower_components/paper-time-picker/paper-time-picker.html">
 <link rel="import" href="../bower_components/paper-dialog/paper-dialog.html">
 <link rel="import" href="../bower_components/paper-button/paper-button.html">
+<link rel="import" href="./hours-timepicker.html">
 
 <dom-module id="dialog-time">
 
     <template>
-        <style>
-            /* local CSS here */
-        </style>
+        <style></style>
 
         <paper-dialog id="dialog" modal class="paper-time-picker-dialog">
-            <paper-time-picker id="timePicker"></paper-time-picker>
+            <hours-timepicker id="timePicker"></hours-timepicker>
             <div class="buttons">
                 <paper-button dialog-dismiss>Cancel</paper-button>
                 <paper-button on-tap="_handleOk" dialog-confirm>OK</paper-button>
@@ -31,14 +27,17 @@
                 time: String
             },
             open: function() {
-                this.$.timePicker.time = this.time;
                 this.$.dialog.open();
             },
             _handleOk: function () {
-                var hours = this.$.timePicker.hour;
-                var minutes = this.$.timePicker.minute;
-                this.time = ((hours < 10) ? '0' : '') + hours + ':' + ((minutes < 10) ? '0' : '') + minutes + ':00.000Z';
-                this.fire('ok');
+                if(this.$.timePicker.time) {
+                    this.time = this.$.timePicker.time;
+                    this.fire('ok');
+                }
+                else {
+                    // todo: add message 'time not valid'
+                    // todo: avoid to close the dialog
+                }
             }
         });
     </script>
