@@ -5,6 +5,7 @@
 
 <link rel="import" href="./hours-hour.html">
 <link rel="import" href="./hdbase-service.html">
+<link rel="import" href="./hours-datepicker.html">
 
 <dom-module id="hours-card">
 
@@ -31,9 +32,8 @@
                 <div id="idTotalHours"></div>
                 <paper-fab on-tap="_openDateDialog" icon="add" class="addButton green" title="Ajouter une date"></paper-fab>
 
-                <paper-dialog id="idDateDialog" class="paper-date-picker-dialog" modal
-                              on-iron-overlay-closed="dismissDialog">
-                    <paper-date-picker id="idDatePicker" headingFormat="ddd D MMM" locale="fr"></paper-date-picker>
+                <paper-dialog id="idDateDialog" modal on-iron-overlay-closed="dismissDialog">
+                    <hours-datepicker id="idDatePicker"></hours-datepicker>
                     <div class="buttons">
                         <paper-button dialog-dismiss>Cancel</paper-button>
                         <paper-button on-tap="_createNewDate" dialog-confirm>OK</paper-button>
@@ -80,6 +80,17 @@
             },
 
             _openDateDialog: function() {
+                var disabledDays = [];
+                var lastDay = '00';
+                var listDays = this.$.idHours.getElementsByTagName('hours-hour');
+                for(var i=0; i<listDays.length; i++) {
+                    var day = listDays[i]._day;
+                    lastDay = +day>+lastDay ? day : lastDay;
+                    disabledDays.push(day);
+                }
+
+                this.$.idDatePicker.disabledDays = disabledDays;
+                this.$.idDatePicker.selectNextDay(lastDay);
                 this.$.idDateDialog.open();
             },
             dismissDialog: function() {
@@ -88,13 +99,16 @@
                 return ((num < 10) ? '0' : '') + num;
             },
             _createNewDate: function() {
+                if(!this.$.idDatePicker.day) {
+                    return;
+                }
+
                 // create time now
                 var now = new Date();
                 var newTime = this._format2digit(now.getHours()) + ':' + this._format2digit(now.getMinutes()) + ':00.000Z';
 
                 // get date picked
-                var dayPicked = this.$.idDatePicker.date.getDate();
-                var newDate = this.year + '-' + this.month + '-' + this._format2digit(dayPicked);
+                var newDate = this.year + '-' + this.month + '-' + this.$.idDatePicker.day;
 
                 // todo: create hours-hour tag waiting db callback
                 window.hDBase.setHour(this.service, newDate, 'begin', newDate + 'T' + newTime);
