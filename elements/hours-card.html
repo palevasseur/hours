@@ -53,7 +53,7 @@
             is: 'hours-card',
 
             ready: function () {
-                //this._displayHours();
+                this.hoursLoaded = false;
             },
 
             properties: {
@@ -80,17 +80,19 @@
             },
 
             _openDateDialog: function() {
+                if(!this.hoursLoaded) {
+                    // open date picker only if dates loaded
+                    return;
+                }
+
                 var disabledDays = [];
-                var lastDay = '00';
                 var listDays = this.$.idHours.getElementsByTagName('hours-hour');
                 for(var i=0; i<listDays.length; i++) {
                     var day = listDays[i]._day;
-                    lastDay = +day>+lastDay ? day : lastDay;
                     disabledDays.push(day);
                 }
 
                 this.$.idDatePicker.disabledDays = disabledDays;
-                this.$.idDatePicker.selectNextDay(lastDay);
                 this.$.idDateDialog.open();
             },
             dismissDialog: function() {
@@ -150,6 +152,7 @@
                     }
 
                     self.$.idTotalHours.innerHTML = '<br>Total heures = ' + self._format2digit(Math.floor(hours / 60)) + 'h' + self._format2digit(hours % 60);
+                    self.hoursLoaded = true;
                 });
             }
 

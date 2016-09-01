@@ -96,7 +96,8 @@
                 this.selectedDate.classList.add('selected');
                 this.day = this.selectedDate.innerText;
             },
-            _disabledDaysChanges: function(list) {
+            _disabledDaysChanges: function() {
+                // disable days
                 var listElem = this.getElementsByClassName('key');
                 for(var i=0; i<listElem.length; i++)
                 {
@@ -108,6 +109,14 @@
                         date.classList.remove('disabled');
                     }
                 }
+
+                // select next day available
+                var lastDay = '00';
+                if(this.disabledDays.length>0) {
+                    lastDay = this.disabledDays[this.disabledDays.length - 1];
+                }
+
+                this.selectNextDay(lastDay);
             },
             _Disabled: function(item) {
                 var disabled = false;
