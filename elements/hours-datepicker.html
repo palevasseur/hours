@@ -14,6 +14,7 @@
             .key {
                 padding: 9px;
                 margin: 1px;
+                cursor: pointer;
             }
 
             .disabled {
@@ -22,6 +23,10 @@
 
             .selected {
                 background-color: rgba(127, 226, 159, 0.24);
+            }
+
+            .currentDay {
+                border: solid 1px darkblue;
             }
 
             .container {
@@ -50,19 +55,24 @@
             ready: function () {
                 this.dates = ['01', '02', '03', '04', '05', '06', '07', '08', '09', '10', '11', '12', '13', '14', '15',
                     '16', '17', '18', '19', '20', '21', '22', '23', '24', '25', '26', '27', '28', '29', '30', '31'];
-                this.selectedDate = null;
+                this.selectedDayHtmlElem = null;
+                this.selectedDay = '';
+                this.month = '';
+                this.year = '';
             },
             properties: {
-                day: String,
                 disabledDays:{
                     type: Array,
                     value: [],
                     observer: '_disabledDaysChanges'
                 }
             },
+            getSelectedDate: function() {
+                return this.selectedDay ? (this.year + '-' + this.month + '-' + this.selectedDay) : '';
+            },
             selectNextDay: function(day) {
-                if(this.selectedDate) {
-                    this.selectedDate.classList.remove('selected')
+                if(this.selectedDayHtmlElem) {
+                    this.selectedDayHtmlElem.classList.remove('selected')
                 }
 
                 var listElem = this.getElementsByClassName('key');
@@ -76,11 +86,50 @@
                     }
                     else {
                         if(!this._Disabled(date.innerText)) {
-                            this.selectedDate = date;
-                            this.selectedDate.classList.add('selected');
-                            this.day = this.selectedDate.innerText;
+                            this.selectedDayHtmlElem = date;
+                            this.selectedDayHtmlElem.classList.add('selected');
+                            this.selectedDay = this.selectedDayHtmlElem.innerText;
+                            this.fire('selectedDay', this.selectedDay);
                             break;
                         }
+                    }
+                }
+            },
+            init: function(month, year, disabledDays) {
+                this.month = month;
+                this.year = year;
+                this.disabledDays = disabledDays;
+
+                if(this.selectedDayHtmlElem) {
+                    this.selectedDayHtmlElem.classList.remove('selected')
+                }
+
+                var currentDay = this.getElementsByClassName('currentDay');
+                if(currentDay && currentDay.length>0) {
+                    currentDay[0].classList.remove('currentDay');
+                }
+
+                var now = new Date();
+                if(+this.year != now.getFullYear() || +this.month != now.getMonth()+1) {
+                    // not current month => no selection
+                    return;
+                }
+
+                var listElem = this.getElementsByClassName('key');
+                for(var i=0; i<listElem.length; i++) {
+                    var date = listElem[i];
+                    if(+date.innerText == now.getDate()) {
+                        // show current date
+                        date.classList.add('currentDay');
+
+                        // select date if not disabled
+                        if(!this._Disabled(date.innerText)) {
+                            this.selectedDayHtmlElem = date;
+                            this.selectedDayHtmlElem.classList.add('selected');
+                            this.selectedDay = this.selectedDayHtmlElem.innerText;
+                            this.fire('selectedDay', this.selectedDay);
+                        }
+                        break;
                     }
                 }
             },
@@ -89,12 +138,13 @@
                     return;
                 }
 
-                if(this.selectedDate) {
-                    this.selectedDate.classList.remove('selected')
+                if(this.selectedDayHtmlElem) {
+                    this.selectedDayHtmlElem.classList.remove('selected')
                 }
-                this.selectedDate = e.srcElement;
-                this.selectedDate.classList.add('selected');
-                this.day = this.selectedDate.innerText;
+                this.selectedDayHtmlElem = e.srcElement;
+                this.selectedDayHtmlElem.classList.add('selected');
+                this.selectedDay = this.selectedDayHtmlElem.innerText;
+                this.fire('selectedDay', this.selectedDay);
             },
             _disabledDaysChanges: function() {
                 // disable days
@@ -111,12 +161,12 @@
                 }
 
                 // select next day available
-                var lastDay = '00';
+                /*var lastDay = '00';
                 if(this.disabledDays.length>0) {
                     lastDay = this.disabledDays[this.disabledDays.length - 1];
                 }
 
-                this.selectNextDay(lastDay);
+                this.selectNextDay(lastDay);*/
             },
             _Disabled: function(item) {
                 var disabled = false;

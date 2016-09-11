@@ -38,7 +38,7 @@
                     <hours-datepicker id="idDatePicker"></hours-datepicker>
                     <div class="buttons">
                         <paper-button dialog-dismiss>Cancel</paper-button>
-                        <paper-button on-tap="_createNewDate" dialog-confirm>OK</paper-button>
+                        <paper-button id="idOkButton" on-tap="_createNewDate" dialog-confirm disabled>OK</paper-button>
                     </div>
                 </paper-dialog>
             </div>
@@ -56,6 +56,7 @@
 
             ready: function () {
                 this.hoursLoaded = false;
+                this.$.idDatePicker.addEventListener('selectedDay', this._enableDlgOkButton.bind(this));
             },
 
             properties: {
@@ -81,6 +82,9 @@
                 }
             },
 
+            _enableDlgOkButton: function() {
+                this.$.idOkButton.disabled = false;
+            },
             _openDateDialog: function() {
                 if(!this.hoursLoaded) {
                     // open date picker only if dates loaded
@@ -94,7 +98,8 @@
                     disabledDays.push(day);
                 }
 
-                this.$.idDatePicker.disabledDays = disabledDays;
+                this.$.idOkButton.disabled = true;
+                this.$.idDatePicker.init(this.month, this.year, disabledDays);
                 this.$.idDateDialog.open();
             },
             dismissDialog: function() {
@@ -103,7 +108,7 @@
                 return ((num < 10) ? '0' : '') + num;
             },
             _createNewDate: function() {
-                if(!this.$.idDatePicker.day) {
+                if(!this.$.idDatePicker.getSelectedDate()) {
                     return;
                 }
 
@@ -112,7 +117,7 @@
                 var newTime = this._format2digit(now.getHours()) + ':' + this._format2digit(now.getMinutes()) + ':00.000Z';
 
                 // get date picked
-                var newDate = this.year + '-' + this.month + '-' + this.$.idDatePicker.day;
+                var newDate = this.$.idDatePicker.getSelectedDate();
 
                 // todo: create hours-hour tag waiting db callback
                 window.hDBase.setHour(this.service, newDate, 'begin', newDate + 'T' + newTime);
