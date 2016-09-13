@@ -15,24 +15,17 @@
     <link rel="import" href="./elements/hours-card.html">
     <link rel="import" href="./elements/hours-date.html">
 
-    <!-- ex: ...&services=Garde:garde,Ménage:menage -->
+    <!-- ex: ...&services=Garde:garde:1-15h45:2-15h45:3-12h30:4-15h45:5-15h45,Ménage:menage&user=writer -->
 
     <!--
-     - init hours-timepicker with the selected time before open it
-     - add error message when create new date already existing
-     - create a hours-datepicker (only not-created date can be selected)
+     - add user=writer/reader in url
+     - new date => init with "contract time" (ex: 15h45 - 18h30) => set contract time in url
+     - time picker => select time clicked (no need disabled ok)
      - review the workaround about db update listener not working with startDate/endDate filter (hdbase-service)
-     - manage (+) to add hour:
-        - propose = current month/year, last day not enterred.
-        - if current month, propose current day
-        - disable possibility to select month (month = the one selected in combobox)
-        - disable day already enterred
      - add "highlight color" waiting DB callback
      - error message, on cnx failed
      ---
-     - remove old timepicker refs
      - diff time < 0 => display "erreur"
-     - new date => init with "contract time" (ex: 15h45 - 18h30)
      - add drop down service, if only 1 service don't add drop down
      - review/better management for local/gmt (current issue with calc around 00h00)
      - check 'to do', check unseless dependency (remove iron-icon)

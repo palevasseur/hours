@@ -28,9 +28,11 @@
         </paper-dropdown-menu>
         <paper-dropdown-menu label="Années" style="width: 70px">
             <paper-listbox id="idYear" class="dropdown-content" on-iron-select="yearChanged">
-                <paper-item value="2015">2015</paper-item>
                 <paper-item value="2016">2016</paper-item>
                 <paper-item value="2017">2017</paper-item>
+                <paper-item value="2018">2018</paper-item>
+                <paper-item value="2019">2019</paper-item>
+                <paper-item value="2020">2020</paper-item>
             </paper-listbox>
         </paper-dropdown-menu>
 
@@ -45,7 +47,7 @@
                 var nowYear = nowYearMonth[0];
                 var nowMonth = nowYearMonth[1];
 
-                this.$.idYear.selectIndex(nowYear-2015); // todo: search value==yearMonth[0] in listbox
+                this.$.idYear.selectIndex(nowYear-2016); // todo: search value==yearMonth[0] in listbox
                 this.$.idMonth.selectIndex(nowMonth-1); // todo: search value==yearMonth[1] in listbox
             },
             properties: {

@@ -59,16 +59,16 @@
                 this.selectedDay = '';
                 this.month = '';
                 this.year = '';
+                this.disabledDays = [];
             },
             properties: {
-                disabledDays:{
-                    type: Array,
-                    value: [],
-                    observer: '_disabledDaysChanges'
-                }
             },
-            getSelectedDate: function() {
+            getSelectedDay: function() {
                 return this.selectedDay ? (this.year + '-' + this.month + '-' + this.selectedDay) : '';
+            },
+            getSelectedWeekDay: function() {
+                var date = new Date(+this.year, +this.month-1, +this.selectedDay);
+                return date.getDay();  // 0:Sunday, 1:Monday...
             },
             selectNextDay: function(day) {
                 if(this.selectedDayHtmlElem) {
@@ -99,6 +99,7 @@
                 this.month = month;
                 this.year = year;
                 this.disabledDays = disabledDays;
+                this._disabledDaysChanges();
 
                 if(this.selectedDayHtmlElem) {
                     this.selectedDayHtmlElem.classList.remove('selected')

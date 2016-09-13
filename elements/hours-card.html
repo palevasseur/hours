@@ -108,20 +108,38 @@
                 return ((num < 10) ? '0' : '') + num;
             },
             _createNewDate: function() {
-                if(!this.$.idDatePicker.getSelectedDate()) {
+                if(!this.$.idDatePicker.getSelectedDay()) {
                     return;
                 }
 
                 // create time now
                 var now = new Date();
-                var newTime = this._format2digit(now.getHours()) + ':' + this._format2digit(now.getMinutes()) + ':00.000Z';
+                var nowTime = this._format2digit(now.getHours()) + ':' + this._format2digit(now.getMinutes()) + ':00.000Z';
+
+                // create 'contract time' for service 'garde'
+                var beginTime = nowTime;
+                if(this.service.toLowerCase().indexOf('garde')>=0) {
+                    switch(this.$.idDatePicker.getSelectedWeekDay()) {
+                        case 1: // Monday
+                        case 2: // Tuesday
+                        case 4: // Thursday
+                        case 5: // Friday
+                            beginTime = '15:45:00.000Z';
+                            break;
+                        case 3: // Wednesday
+                            beginTime = '12:30:00.000Z';
+                            break;
+                        case 0: // Sunday
+                        case 6: // Saturday
+                    }
+                }
 
                 // get date picked
-                var newDate = this.$.idDatePicker.getSelectedDate();
+                var newDate = this.$.idDatePicker.getSelectedDay();
 
                 // todo: create hours-hour tag waiting db callback
-                window.hDBase.setHour(this.service, newDate, 'begin', newDate + 'T' + newTime);
-                window.hDBase.setHour(this.service, newDate, 'end', newDate + 'T' + newTime);
+                window.hDBase.setHour(this.service, newDate, 'begin', newDate + 'T' + beginTime);
+                window.hDBase.setHour(this.service, newDate, 'end', newDate + 'T' + nowTime);
             },
             _displayHours: function() {
                 if(!this.month || !this.year) {
@@ -145,7 +163,7 @@
                             nbrItemsUsed++;
                             var attr = value[index];
                             var e = document.createElement('div');
-                            e.innerHTML = '<hours-hour start="' + attr.begin + '" end="' + attr.end + '" service="' + self.service + '"></hours-hour>';
+                            e.innerHTML = '<hours-hour year="' + self.year + '" month="' + self.month + '" start="' + attr.begin + '" end="' + attr.end + '" service="' + self.service + '"></hours-hour>';
                             list.appendChild(e);
                         }
                     }

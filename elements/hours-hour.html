@@ -20,6 +20,7 @@
         </style>
 
         <div id="idHour" on-mouseover="_select" on-mouseout="_unselect">
+            <span>{{_WeekDay}} </span>
             <span>{{_day}}:</span>
             <span id="idStartTime" class="time" on-tap="_handleTapStart">{{_timeStart}}</span>
             <span> - </span>
@@ -38,10 +39,13 @@
                 this._refresh();
             },
             properties: {
+                year:String,
+                month:String,
                 start: String,
                 end: String,
                 service: String,
                 _day: String,
+                _WeekDay: String,
                 _timeStart: String,
                 _timeEnd: String,
                 _hours: String,
@@ -54,11 +58,21 @@
                 var timeM = timeHM.split(':')[1];
                 return (parseInt(timeH) * 60 + parseInt(timeM));
             },
-            _refresh: function () {
+            _refresh: function() {
                 this._day = this._getDay(this.start!='undefined' ? this.start : this.end);
+                this._WeekDay = this._getWeekDay(+this.year, +this.month, +this._day);
                 this._timeStart = this.start!='undefined' ? this._getTime(this.start) : 'error-start-not-def';
-                this._timeEnd = this.end!='undefined' ? this._getTime(this.end) : 'error-end-not-def';;
+                this._timeEnd = this.end!='undefined' ? this._getTime(this.end) : 'error-end-not-def';
                 this._hours = (this.start!='undefined' && this.end!='undefined') ? this._computeHours(this.start, this.end, 'h') : 'error-missing-def';
+            },
+            _getWeekDay: function(year, month, day) {
+                if(!year || !month || !day) {
+                    return '';
+                }
+
+                var date = new Date(year, month-1, day);
+                var dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+                return dayNames[date.getDay()];  // getDay => 0:Sunday, 1:Monday...
             },
             _select: function () {
                 this.$.idClearButton.style.visibility='visible';
