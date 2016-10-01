@@ -8,7 +8,7 @@
     <template>
         <style></style>
 
-        <paper-dialog id="dialog" modal class="paper-time-picker-dialog">
+        <paper-dialog id="dialog" modal class="paper-time-picker-dialog"  onIronOverlayOpened>
             <hours-timepicker id="timePicker"></hours-timepicker>
             <div class="buttons">
                 <paper-button dialog-dismiss>Cancel</paper-button>
@@ -22,12 +22,16 @@
         Polymer({
             is: 'dialog-time',
             ready: function () {
+                this.$.dialog.addEventListener('iron-overlay-opened', this._selectTime.bind(this));
             },
             properties: {
                 time: String
             },
             open: function() {
                 this.$.dialog.open();
+            },
+            _selectTime: function () {
+                this.$.timePicker.time = this.time;
             },
             _handleOk: function () {
                 if(this.$.timePicker.time) {

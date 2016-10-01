@@ -7,10 +7,18 @@
             return ((num < 10) ? '0' : '') + num;
         };
 
-        // return '04:35:00.000Z'
+        // return current time rounded modulo 5 mins
+        // ex: '04:35:00.000Z'
         var getTimeNow = function() {
             var now = new Date();
-            return this._format2digit(now.getHours()) + ':' + this._format2digit(now.getMinutes()) + ':00.000Z'
+            var minutes = now.getMinutes();
+
+            if(minutes % 5 > 0) {
+                // minutes not exact (last digit 0 or 5) => round superior modulo 5 value
+                minutes =  minutes + 5 - (minutes % 5);
+            }
+
+            return format2digit(now.getHours()) + ':' + format2digit(minutes) + ':00.000Z'
         };
 
         // 245 (minutes) => '04h05'

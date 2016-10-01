@@ -11,7 +11,12 @@
                 width: 220px;
             }
 
-            .key {
+            .keyHours {
+                padding: 9px;
+                margin: 1px;
+            }
+
+            .keyMinutes {
                 padding: 9px;
                 margin: 1px;
             }
@@ -33,13 +38,13 @@
             <div class="title">Heures / Minutes</div>
             <div class="container flex-wrap">
                 <template is="dom-repeat" items="{{hours}}">
-                    <div on-tap="_handleHours" class="key">{{item}}</div>
+                    <div on-tap="_handleHours" class="keyHours">{{item}}</div>
                 </template>
             </div>
             <br>
             <div class="container flex-wrap">
                 <template is="dom-repeat" items="{{minutes}}">
-                    <div  on-tap="_handleMinutes" class="key">{{item}}</div>
+                    <div  on-tap="_handleMinutes" class="keyMinutes">{{item}}</div>
                 </template>
             </div>
         </div>
@@ -56,25 +61,55 @@
                 this.selectedMinutes = null;
             },
             properties: {
-                time: String
+                time: {
+                    type: String,
+                    observer: '_selectTime'
+                }
             },
-            _handleHours: function(e) {
+            _selectTime: function () {
+                // select hours
+                var hours = Number(this.time.split(':')[0] || 0);
+                var listElemHours = this.getElementsByClassName('keyHours');
+                for(var iH=0; iH<listElemHours.length; iH++) {
+                    if(Number(listElemHours[iH].innerText)==hours) {
+                        this._selectHours(listElemHours[iH]);
+                        break;
+                    }
+                }
+
+                // select minutes
+                var minutes = Number(this.time.split(':')[1]) || 0;
+                var listElemMinutes = this.getElementsByClassName('keyMinutes');
+                for(var iM=0; iM<listElemMinutes.length; iM++) {
+                    if(Number(listElemMinutes[iM].innerText)>=minutes) {
+                        this._selectMinutes(listElemMinutes[iM]);
+                        break;
+                    }
+                }
+            },
+            _handleHours: function(event) {
+                this._selectHours(event.srcElement);
+            },
+            _handleMinutes: function(event) {
+                this._selectMinutes(event.srcElement);
+            },
+            _selectHours: function(elem) {
                 if(this.selectedHours) {
                     this.selectedHours.classList.remove('selected')
                 }
-                this.selectedHours = e.srcElement;
+                this.selectedHours = elem;
                 this.selectedHours.classList.add('selected');
-                this._handleSelection();
+                this._updateTime();
             },
-            _handleMinutes: function(e) {
+            _selectMinutes: function(elem) {
                 if(this.selectedMinutes) {
                     this.selectedMinutes.classList.remove('selected')
                 }
-                this.selectedMinutes = e.srcElement;
+                this.selectedMinutes = elem;
                 this.selectedMinutes.classList.add('selected');
-                this._handleSelection();
+                this._updateTime();
             },
-            _handleSelection: function () {
+            _updateTime: function () {
                 if(this.selectedHours && this.selectedMinutes) {
                     this.time = this.selectedHours.innerText + ':' + this.selectedMinutes.innerText + ':00.000Z';
                 }
