@@ -1,0 +1,40 @@
+<script>
+    (function() {
+        // return 2 digit string:
+        //   1  => '01'
+        //   12 => '12'
+        var format2digit = function( num) {
+            return ((num < 10) ? '0' : '') + num;
+        };
+
+        // return '04:35:00.000Z'
+        var getTimeNow = function() {
+            var now = new Date();
+            return this._format2digit(now.getHours()) + ':' + this._format2digit(now.getMinutes()) + ':00.000Z'
+        };
+
+        // 245 (minutes) => '04h05'
+        var formatHoursMinutes = function(totalMinutes) {
+            return format2digit(Math.floor(totalMinutes / 60)) + 'h' + format2digit(totalMinutes % 60)
+        };
+
+        // return explicit week day: 'Lun', Mar'...
+        var getWeekDay = function(year, month, day) {
+            if(!year || !month || !day) {
+                return '';
+            }
+
+            var date = new Date(year, month-1, day);
+            var dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
+            return dayNames[date.getDay()];  // getDay => 0:Sunday, 1:Monday...
+        };
+
+        window.util = {
+            getWeekDay: getWeekDay,
+            format2digit: format2digit,
+            getTimeNow: getTimeNow,
+            formatHoursMinutes: formatHoursMinutes
+        };
+    })();
+
+</script>

@@ -8,6 +8,7 @@
 <link rel="import" href="./hours-hour.html">
 <link rel="import" href="./hdbase-service.html">
 <link rel="import" href="./hours-datepicker.html">
+<link rel="import" href="./hours-util.html">
 
 <dom-module id="hours-card">
 
@@ -104,9 +105,6 @@
             },
             dismissDialog: function() {
             },
-            _format2digit: function( num) {
-                return ((num < 10) ? '0' : '') + num;
-            },
             _createNewDate: function() {
                 if(!this.$.idDatePicker.getSelectedDay()) {
                     return;
@@ -114,7 +112,7 @@
 
                 // create time now
                 var now = new Date();
-                var nowTime = this._format2digit(now.getHours()) + ':' + this._format2digit(now.getMinutes()) + ':00.000Z';
+                var nowTime = window.util.getTimeNow();
 
                 // create 'contract time' for service 'garde'
                 var beginTime = nowTime;
@@ -171,12 +169,12 @@
                     window.console.log('Updated hours (' + nbrItemsUsed + ' items), received (total of ' + nbrItems + ' items) from DB for service "' + self.service + '"');
 
                     // compute total hours for the month
-                    var hours = 0;
+                    var mins = 0;
                     for (var i = 0; i < list.children.length; i++) {
-                        hours += list.children[i].firstChild.getMinutes();
+                        mins += list.children[i].firstChild.getMinutes();
                     }
 
-                    self.$.idTotalHours.innerHTML = '<br>Total heures = ' + self._format2digit(Math.floor(hours / 60)) + 'h' + self._format2digit(hours % 60);
+                    self.$.idTotalHours.innerHTML = '<br>Total heures = ' + window.util.formatHoursMinutes(mins);
                     self.hoursLoaded = true;
                 });
             }

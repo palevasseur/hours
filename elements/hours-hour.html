@@ -3,6 +3,7 @@
 <link rel="import" href="./dialog-confirm.html">
 <link rel="import" href="./dialog-time.html">
 <link rel="import" href="./hdbase-service.html">
+<link rel="import" href="./hours-util.html">
 
 <dom-module id="hours-hour">
 
@@ -60,19 +61,10 @@
             },
             _refresh: function() {
                 this._day = this._getDay(this.start!='undefined' ? this.start : this.end);
-                this._WeekDay = this._getWeekDay(+this.year, +this.month, +this._day);
+                this._WeekDay = window.util.getWeekDay(+this.year, +this.month, +this._day);
                 this._timeStart = this.start!='undefined' ? this._getTime(this.start) : 'error-start-not-def';
                 this._timeEnd = this.end!='undefined' ? this._getTime(this.end) : 'error-end-not-def';
                 this._hours = (this.start!='undefined' && this.end!='undefined') ? this._computeHours(this.start, this.end, 'h') : 'error-missing-def';
-            },
-            _getWeekDay: function(year, month, day) {
-                if(!year || !month || !day) {
-                    return '';
-                }
-
-                var date = new Date(year, month-1, day);
-                var dayNames = ['Dim', 'Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam'];
-                return dayNames[date.getDay()];  // getDay => 0:Sunday, 1:Monday...
             },
             _select: function () {
                 this.$.idClearButton.style.visibility='visible';
