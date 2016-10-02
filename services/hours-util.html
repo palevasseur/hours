@@ -18,7 +18,12 @@
                 minutes =  minutes + 5 - (minutes % 5);
             }
 
-            return format2digit(now.getHours()) + ':' + format2digit(minutes) + ':00.000Z'
+            if(minutes==60) {
+                return format2digit(now.getHours() + 1) + ':00:00.000Z'
+            }
+            else {
+                return format2digit(now.getHours()) + ':' + format2digit(minutes) + ':00.000Z'
+            }
         };
 
         // 245 (minutes) => '04h05'

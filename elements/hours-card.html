@@ -8,7 +8,8 @@
 <link rel="import" href="./hours-hour.html">
 <link rel="import" href="./hdbase-service.html">
 <link rel="import" href="./hours-datepicker.html">
-<link rel="import" href="./hours-util.html">
+<link rel="import" href="../services/hours-util.html">
+<link rel="import" href="../services/app_config.html">
 
 <dom-module id="hours-card">
 
@@ -110,34 +111,13 @@
                     return;
                 }
 
-                // create time now
-                var now = new Date();
-                var nowTime = window.util.getTimeNow();
-
-                // create 'contract time' for service 'garde'
-                var beginTime = nowTime;
-                if(this.service.toLowerCase().indexOf('garde')>=0) {
-                    switch(this.$.idDatePicker.getSelectedWeekDay()) {
-                        case 1: // Monday
-                        case 2: // Tuesday
-                        case 4: // Thursday
-                        case 5: // Friday
-                            beginTime = '15:45:00.000Z';
-                            break;
-                        case 3: // Wednesday
-                            beginTime = '12:30:00.000Z';
-                            break;
-                        case 0: // Sunday
-                        case 6: // Saturday
-                    }
-                }
-
                 // get date picked
                 var newDate = this.$.idDatePicker.getSelectedDay();
 
                 // todo: create hours-hour tag waiting db callback
-                window.hDBase.setHour(this.service, newDate, 'begin', newDate + 'T' + beginTime);
-                window.hDBase.setHour(this.service, newDate, 'end', newDate + 'T' + nowTime);
+                var contractDates = window.app_config.getContractDates(this.service, this.$.idDatePicker.getSelectedWeekDay());
+                window.hDBase.setHour(this.service, newDate, 'begin', newDate + 'T' + contractDates.begin);
+                window.hDBase.setHour(this.service, newDate, 'end', newDate + 'T' + contractDates.end);
             },
             _displayHours: function() {
                 if(!this.month || !this.year) {

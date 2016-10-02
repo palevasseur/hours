@@ -1,0 +1,49 @@
+<link rel="import" href="../services/hours-util.html">
+
+<script>
+    (function() {
+        var contracts = {
+            begin:{
+                //                Sun.   , Mon.   , Tue.   , Wed.   , Thu.   , Fri.   , Sat.
+                'sabrina-garde': [''     , '15:45', '15:45', '12:30', '15:45', '15:45', ''     ],
+                'sabrina-menage':[''     , '12:00', ''     , ''     , '12:00', ''     , ''     ],
+
+                'test-garde':    [''     , '15:45', '15:45', '12:30', '15:45', '15:45', ''     ],
+                'test-menage':   [''     , '12:00', ''     , ''     , '12:00', ''     , ''     ],
+                'paul-brico':    ['16:30', ''     , ''     , '13:30', ''     , ''     , '16:30']
+            },
+            end:{
+                //                Sun.   , Mon.   , Tue.   , Wed.   , Thu.   , Fri.   , Sat.
+                'sabrina-garde': [''     , ''     , ''     , ''     , ''     , ''     , ''     ],
+                'sabrina-menage':[''     , '15:30', ''     , ''     , '15:30', ''     , ''     ],
+
+                'test-garde':    [''     , ''     , ''     , ''     , ''     , ''     , ''     ],
+                'test-menage':   [''     , '15:30', ''     , ''     , '15:30', ''     , ''     ],
+                'paul-brico':    ['17:30', ''     , ''     , ''     , ''     , ''     , ''     ]
+            }
+        };
+
+        // return begin/end date according to contract or now time
+        // ex: { begin:'08:30:00.000Z', end:'17:30:00.000Z'}
+        var getContractDates = function(service, weekDay) {
+            var dates = {};
+
+            var contractBegin = contracts.begin[service];
+            dates.begin = (contractBegin && contractBegin[weekDay]) ? contractBegin[weekDay] + ':00.000Z' : window.util.getTimeNow();
+
+            var contractEnd = contracts.end[service];
+            var now = window.util.getTimeNow();
+            var nowDate = new Date('2016-01-01T' + now);
+            var beginDate = new Date('2016-01-01T' + dates.begin);
+            var nowOrBeginTime = (nowDate.getTime() < beginDate.getTime()) ? dates.begin : now;
+            dates.end = (contractEnd && contractEnd[weekDay]) ? contractEnd[weekDay] + ':00.000Z' : nowOrBeginTime;
+
+            return dates;
+        };
+
+        window.app_config = {
+            getContractDates: getContractDates
+        };
+    })();
+
+</script>
