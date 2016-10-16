@@ -14,12 +14,15 @@
 
     <link rel="import" href="./elements/hours-card.html">
     <link rel="import" href="./elements/hours-date.html">
+    <link rel="import" href="./services/app_config.html">
+    <link rel="import" href="./services/defs.html">
 
-    <!-- ex: ...&services=Garde:garde,Ménage:menage&user=paul&right=writer -->
+    <!-- ex: ...&services=Test Garde:test-garde,Test Ménage:test-menage&user=paul&rights=writer
+             rights = reader(default) / writer / admin
+    -->
 
     <!--
      - add user=writer/reader in url
-     - new date => init with "contract time" (ex: 15h45 - 18h30) => set contract time in url
      - time picker => select time clicked (no need disabled ok)
      - review the workaround about db update listener not working with startDate/endDate filter (hdbase-service)
      - add "highlight color" waiting DB callback
@@ -57,6 +60,8 @@
     </paper-header-panel>
 
     <script>
+        // ex : ...&services=Test Garde:test-garde,Test Ménage:test-menage&user=paul
+        // return { services:'Test Garde:test-garde,Test Ménage:test-menage', user:'paul' }
         function getSearchParameters() {
             var prmstr = window.location.search.substr(1);
             return prmstr != null && prmstr != "" ? transformToAssocArray(prmstr) : {};
@@ -74,6 +79,11 @@
 
         function init() {
             var params = getSearchParameters();
+
+            // init params before creating cards
+            window.app_config.setParam(window.defs.enumUrlParam.USER, params.user ? params.user : 'guest');
+            window.app_config.setParam(window.defs.enumUrlParam.RIGHTS, params.user && params.rights ? params.rights : window.defs.enumRights.READER);
+
             if(params.services) {
                 var services = params.services.split(',');
                 for ( var i = 0; i < services.length; i++) {
@@ -95,7 +105,7 @@
             }
         }
 
-        init()
+        init(); // doesn't work if <body onload="init()"> => callback of idCurrentDate.addEventListener are not called
     </script>
 </body>
 </html>

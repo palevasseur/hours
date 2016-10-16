@@ -1,4 +1,5 @@
 <link rel="import" href="../services/hours-util.html">
+<link rel="import" href="../services/defs.html">
 
 <script>
     (function() {
@@ -41,8 +42,25 @@
             return dates;
         };
 
+        // manage url params
+        var _params = {};
+        var setParam = function(paramName, value) {
+            _params[paramName] = value;
+        };
+        var getParam = function(paramName) {
+            return _params[paramName];
+        };
+
+        this.hasWriterRights = function() {
+            var rights = getParam(window.defs.enumUrlParam.RIGHTS);
+            return !!rights && (rights == window.defs.enumRights.WRITER || rights == window.defs.enumRights.ADMIN);
+        };
+
         window.app_config = {
-            getContractDates: getContractDates
+            getContractDates: getContractDates,
+            setParam: setParam,
+            getParam: getParam,
+            hasWriterRights: hasWriterRights
         };
     })();
 

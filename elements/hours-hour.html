@@ -2,8 +2,9 @@
 <link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
 <link rel="import" href="./dialog-confirm.html">
 <link rel="import" href="./dialog-time.html">
-<link rel="import" href="./hdbase-service.html">
+<link rel="import" href="../services/hdbase-service.html">
 <link rel="import" href="../services/hours-util.html">
+<link rel="import" href="../services/app_config.html">
 
 <dom-module id="hours-hour">
 
@@ -37,6 +38,10 @@
         Polymer({
             is: 'hours-hour',
             ready: function () {
+                this._hasWriterRights = function() {
+                    return window.app_config.hasWriterRights();
+                };
+
                 this._refresh();
             },
             properties: {
@@ -44,7 +49,7 @@
                 month:String,
                 start: String,
                 end: String,
-                service: String,
+                service: String, // todo: remove param and use window.app_config.getParam(window.defs.enumUrlParam.SERVICES)
                 _day: String,
                 _WeekDay: String,
                 _timeStart: String,
@@ -67,16 +72,28 @@
                 this._hours = (this.start!='undefined' && this.end!='undefined') ? this._computeHours(this.start, this.end, 'h') : 'error-missing-def';
             },
             _select: function () {
+                if(!this._hasWriterRights()) {
+                    return;
+                }
+
                 this.$.idClearButton.style.visibility='visible';
                 this.$.idStartTime.style.border = "solid 1px gainsboro";
                 this.$.idEndTime.style.border = "solid 1px gainsboro";
             },
             _unselect: function () {
-                this.$.idClearButton.style.visibility='hidden';
+                if(!this._hasWriterRights()) {
+                    return;
+                }
+
+                this.$.idClearButton.style.visibility = 'hidden';
                 this.$.idStartTime.style.border = "solid 1px white";
                 this.$.idEndTime.style.border = "solid 1px white";
             },
             _handleTapStart: function() {
+                if(!this._hasWriterRights()) {
+                    return;
+                }
+
                 if(this._paperDialog) {
                     this.$.idDialogContainer.removeChild(this._paperDialog);
                 }
@@ -90,6 +107,10 @@
                 this._paperDialog.open();
             },
             _handleTapEnd: function() {
+                if(!this._hasWriterRights()) {
+                    return;
+                }
+
                 if(this._paperDialog) {
                     this.$.idDialogContainer.removeChild(this._paperDialog);
                 }
@@ -103,6 +124,10 @@
                 this._paperDialog.open();
             },
             _handleRemove: function() {
+                if(!this._hasWriterRights()) {
+                    return;
+                }
+
                 if(this._paperDialog) {
                     this.$.idDialogContainer.removeChild(this._paperDialog);
                 }
